@@ -7,7 +7,7 @@ const cookieParser = require('cookie-parser');
 const { connectToDB } = require('./config/db');
 const apiRouter = require('./routes/api.routes');
 
-connectToDB();
+
 
 const app = express();
 
