@@ -1,0 +1,52 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username  String   @unique
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  files     File[]
+  folders   Folder[]
+
+  @@map("users")
+}
+
+model Folder {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  parentId  String?  @map("parent_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  parent    Folder?  @relation("FolderTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Folder[] @relation("FolderTree")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  files     File[]
+
+  @@index([userId, parentId], map: "folders_user_parent_idx")
+  @@map("folders")
+}
+
+model File {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  path         String
+  originalname String
+  userId       String   @map("user_id") @db.Uuid
+  folderId     String?  @map("folder_id") @db.Uuid
+  size         Int?
+  mimetype     String?
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  folder       Folder?  @relation(fields: [folderId], references: [id], onDelete: Cascade)
+
+  @@index([folderId], map: "files_folder_id_idx")
+  @@map("files")
+}
