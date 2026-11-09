@@ -206,7 +206,9 @@ router.post('/files', authMiddleware, receiveFile, async (req, res) => {
     }
 
     const mimetype = TYPES[ext]; // set by us, not trusted from the browser
-    const filePath = `${uuidv4()}.${ext}`;
+    const filePath = `${randomUUID()}.${ext}`;
+
+  
 
     const { error } = await supabase.storage
       .from(BUCKET)
