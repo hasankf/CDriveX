@@ -24,12 +24,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api', apiRouter);
 app.use((req, res) => res.status(404).json({ message: 'Not found' }));
 
-// 2. Only listen during local development
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+// 2. Define PORT and only listen outside Vercel's serverless environment
+const PORT = process.env.PORT || 3000;
+
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
 
 module.exports = app;
