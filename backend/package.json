@@ -18,6 +18,7 @@
     "prisma": "^7.10.1"
   },
   "scripts" : {
+    "vercel-build": "prisma generate",
     "start": "tsx app.js",
     "dev": "tsx watch app.js",
     "postinstall": "prisma generate"
