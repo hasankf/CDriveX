@@ -1,6 +1,5 @@
 generator client {
-  provider     = "prisma-client-js"
- 
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -8,13 +7,14 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  username  String   @unique
-  email     String   @unique
+  id        String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username  String          @unique
+  email     String          @unique
   password  String
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  createdAt DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
   files     File[]
   folders   Folder[]
+  chunks    DocumentChunk[]
 
   @@map("users")
 }
@@ -35,17 +35,35 @@ model Folder {
 }
 
 model File {
-  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id           String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   path         String
   originalname String
-  userId       String   @map("user_id") @db.Uuid
-  folderId     String?  @map("folder_id") @db.Uuid
+  userId       String          @map("user_id") @db.Uuid
+  folderId     String?         @map("folder_id") @db.Uuid
   size         Int?
   mimetype     String?
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  folder       Folder?  @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  ragStatus    String          @default("NONE") @map("rag_status")
+  createdAt    DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  folder       Folder?         @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  chunks       DocumentChunk[]
 
   @@index([folderId], map: "files_folder_id_idx")
   @@map("files")
+}
+
+model DocumentChunk {
+  id         String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fileId     String                      @map("file_id") @db.Uuid
+  userId     String                      @map("user_id") @db.Uuid
+  chunkIndex Int                         @map("chunk_index")
+  content    String
+  embedding  Unsupported("vector(768)")
+  tsv        Unsupported("tsvector")?
+  createdAt  DateTime                    @default(now()) @map("created_at") @db.Timestamptz(6)
+  file       File                        @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  user       User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, fileId], map: "chunks_user_file_idx")
+  @@map("document_chunks")
 }

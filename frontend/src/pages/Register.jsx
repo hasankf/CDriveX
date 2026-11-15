@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Field from "../components/Field.jsx";
+import Logo from "../components/Logo.jsx";
 import { api } from "../api.js";
 
 export default function Register() {
@@ -29,6 +30,7 @@ export default function Register() {
   return (
     <main className="auth">
       <form className="auth-card" onSubmit={onSubmit}>
+        <Logo className="auth-logo" size={38} />
         <h1>Create your account</h1>
 
         {error && (

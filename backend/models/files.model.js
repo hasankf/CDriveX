@@ -1,6 +1,6 @@
 const prisma = require('../config/prisma');
 
-const publicFields = { id: true, originalname: true, createdAt: true, size: true };
+const publicFields = { id: true, originalname: true, createdAt: true, size: true, ragStatus: true };
 
 function createFile({ path, originalname, userId, folderId, size, mimetype }) {
   return prisma.file.create({

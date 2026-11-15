@@ -2,8 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { api } from "../api.js";
 import { useAuth } from "../auth/AuthContext.jsx";
+import AskAIDrawer from "../components/AskAIDrawer.jsx";
 import FileRow from "../components/FileRow.jsx";
 import FolderRow from "../components/FolderRow.jsx";
+import { SparklesIcon } from "../components/Icons.jsx";
+import Logo from "../components/Logo.jsx";
 import UploadModal from "../components/UploadModal.jsx";
 
 const byName = (a, b) =>
@@ -26,6 +29,8 @@ export default function Home() {
   const [loadError, setLoadError] = useState("");
   const [notice, setNotice] = useState(null);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiTargetFile, setAiTargetFile] = useState(null);
   const [downloadingId, setDownloadingId] = useState(null);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("newest");
@@ -62,6 +67,7 @@ export default function Home() {
   }, [files, query, sort]);
 
   const closeUpload = useCallback(() => setUploadOpen(false), []);
+  const closeAi = useCallback(() => setAiOpen(false), []);
   const isEmpty = folders.length === 0 && files.length === 0;
 
   function handleUploaded(saved) {
@@ -131,6 +137,7 @@ export default function Home() {
     try {
       await api.deleteFile(file.id);
       setData((d) => ({ ...d, files: d.files.filter((f) => f.id !== file.id) }));
+      if (aiTargetFile?.id === file.id) setAiTargetFile(null);
       setNotice({ kind: "ok", text: `Deleted ${file.originalname}.` });
     } catch (err) {
       setNotice({ kind: "error", text: err.message });
@@ -146,7 +153,7 @@ export default function Home() {
   return (
     <>
       <header className="topbar">
-        <span className="brand">Cloud Drive</span>
+        <Logo size={28} to="/" />
         <div className="topbar-right">
           <span className="who">{user?.username}</span>
           <button type="button" className="btn ghost small" onClick={logout}>Log out</button>
@@ -174,6 +181,17 @@ export default function Home() {
             {!loading && !loadError && <p className="muted">{countText}</p>}
           </div>
           <div className="head-actions">
+            <button
+              type="button"
+              className="btn ghost ai-trigger-btn"
+              onClick={() => {
+                setAiTargetFile(null);
+                setAiOpen(true);
+              }}
+            >
+              <SparklesIcon width={17} height={17} />
+              <span>Ask AI</span>
+            </button>
             <button type="button" className="btn ghost" onClick={() => setCreating(true)}>
               New folder
             </button>
@@ -257,6 +275,10 @@ export default function Home() {
                 onDownload={handleDownload}
                 onRename={handleRename}
                 onDelete={handleDelete}
+                onAskAi={(f) => {
+                  setAiTargetFile(f);
+                  setAiOpen(true);
+                }}
               />
             ))}
           </ul>
@@ -266,6 +288,16 @@ export default function Home() {
       {uploadOpen && (
         <UploadModal folderId={folderId} onClose={closeUpload} onUploaded={handleUploaded} />
       )}
+
+      <AskAIDrawer
+        open={aiOpen}
+        onClose={closeAi}
+        folderId={folderId}
+        folderName={currentName}
+        targetFile={aiTargetFile}
+        onClearTargetFile={() => setAiTargetFile(null)}
+        onOpenSource={handleDownload}
+      />
     </>
   );
 }

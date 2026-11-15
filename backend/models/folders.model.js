@@ -2,23 +2,35 @@ const prisma = require('../config/prisma');
 
 const publicFolder = { id: true, name: true, createdAt: true };
 
+// purpose: get all folders directly inside a particular folder. it takes USERID and PARENTID as parameter.
+// only lists direct children, not any further
+
 function listChildren(userId, parentId) {
   return prisma.folder.findMany({
-    where: { userId, parentId }, // parentId null = top level
-    select: publicFolder,
+    where: { userId, parentId }, // if parentid is null then only ROOT level folders are returned
+    select: publicFolder, // returns FOLDERID FOLDERNAME CREATEDDATE
     orderBy: { name: 'asc' },
   });
 }
+
+// Purpose: Find a folder only if it belongs to the requesting user.
 
 function findOwned(id, userId) {
   return prisma.folder.findFirst({ where: { id, userId }, select: { id: true, name: true } });
 }
 
+//Purpose: Create a new folder.
+// if we create a root folder its parentid == null
 function createFolder({ name, parentId, userId }) {
-  return prisma.folder.create({ data: { name, parentId, userId }, select: publicFolder });
+  return prisma.folder.create({ 
+    data: { name, parentId, userId }, 
+    select: publicFolder 
+  });
 }
 
 // Path from the top level down to this folder, e.g. [Work, Reports, 2026]
+// RECURSIVE allows the query to repeatedly follow relationships until it reaches the top-level folder
+
 function breadcrumbs(id, userId) {
   return prisma.$queryRaw`
     WITH RECURSIVE up AS (
@@ -31,7 +43,7 @@ function breadcrumbs(id, userId) {
     SELECT id, name FROM up ORDER BY depth DESC`;
 }
 
-// This folder plus every folder inside it, at any depth
+// find current folder plus every folder inside it, at any depth
 async function subtreeIds(id, userId) {
   const rows = await prisma.$queryRaw`
     WITH RECURSIVE tree AS (

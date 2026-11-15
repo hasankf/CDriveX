@@ -104,4 +104,13 @@ export const api = {
     }),
   deleteFile: (id) =>
     request(`/files/${encodeURIComponent(id)}`, { method: "DELETE" }),
+    // RAG AI Chat
+    // RAG AI Chat
+  ragLibrary: () => request("/rag/library"),
+  askAi: ({ question, fileIds = [], folderIds = [] }) =>
+    request("/rag/chat", {
+      method: "POST",
+      body: { question, fileIds, folderIds },
+    }),
+
 };

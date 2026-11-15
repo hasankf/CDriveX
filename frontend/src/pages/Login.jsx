@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Field from "../components/Field.jsx";
+import Logo from "../components/Logo.jsx";
 import { useAuth } from "../auth/AuthContext.jsx";
 
 export default function Login() {
@@ -32,6 +33,7 @@ export default function Login() {
   return (
     <main className="auth">
       <form className="auth-card" onSubmit={onSubmit}>
+        <Logo className="auth-logo" size={38} />
         <h1>Log in</h1>
 
         {justRegistered && !error && (

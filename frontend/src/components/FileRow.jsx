@@ -1,14 +1,29 @@
 import { useState } from "react";
-import { DownloadIcon, FileIcon, PencilIcon, TrashIcon } from "./Icons.jsx";
+import {
+  DownloadIcon,
+  FileIcon,
+  PencilIcon,
+  SparklesIcon,
+  TrashIcon,
+} from "./Icons.jsx";
 
-export default function FileRow({ file, busy, onDownload, onRename, onDelete }) {
+export default function FileRow({
+  file,
+  busy,
+  onDownload,
+  onRename,
+  onDelete,
+  onAskAi,
+}) {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(file.originalname);
   const [confirming, setConfirming] = useState(false);
   const [working, setWorking] = useState(false);
 
   const date = new Date(file.createdAt).toLocaleDateString(undefined, {
-    day: "numeric", month: "short", year: "numeric",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
   });
 
   async function save(e) {
@@ -71,25 +86,56 @@ export default function FileRow({ file, busy, onDownload, onRename, onDelete }) 
         <button className="btn ghost small" onClick={() => setConfirming(false)} disabled={working}>
           Cancel
         </button>
+        
       </li>
     );
   }
+
+  const isIndexed = file.ragStatus === "INDEXED";
 
   return (
     <li className="file-row">
       <span className="file-icon"><FileIcon /></span>
       <span className="file-name" title={file.originalname}>{file.originalname}</span>
+      {isIndexed && (
+        <span className="ai-badge" title="Indexed for AI search">
+          AI
+        </span>
+      )}
       <span className="file-date">{date}</span>
-      <button className="icon-btn" onClick={() => { setName(file.originalname); setEditing(true); }}
-        aria-label={`Rename ${file.originalname}`} title="Rename">
+      {isIndexed && onAskAi && (
+        <button
+          className="icon-btn ai-row-btn"
+          onClick={() => onAskAi(file)}
+          aria-label={`Ask AI about ${file.originalname}`}
+          title="Ask AI about this file"
+        >
+          <SparklesIcon width={18} height={18} />
+        </button>
+      )}
+      <button
+        className="icon-btn"
+        onClick={() => { setName(file.originalname); setEditing(true); }}
+        aria-label={`Rename ${file.originalname}`}
+        title="Rename"
+      >
         <PencilIcon />
       </button>
-      <button className="icon-btn" onClick={() => onDownload(file)} disabled={busy}
-        aria-label={`Download ${file.originalname}`} title="Download">
+      <button
+        className="icon-btn"
+        onClick={() => onDownload(file)}
+        disabled={busy}
+        aria-label={`Download ${file.originalname}`}
+        title="Download"
+      >
         <DownloadIcon />
       </button>
-      <button className="icon-btn" onClick={() => setConfirming(true)}
-        aria-label={`Delete ${file.originalname}`} title="Delete">
+      <button
+        className="icon-btn"
+        onClick={() => setConfirming(true)}
+        aria-label={`Delete ${file.originalname}`}
+        title="Delete"
+      >
         <TrashIcon />
       </button>
     </li>

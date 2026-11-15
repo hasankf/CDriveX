@@ -43,3 +43,16 @@ export const FolderIcon = (p) => (
     <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
   </svg>
 );
+
+export const SparklesIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3Z" />
+    <path d="M19 3v3M20.5 4.5h-3M5 17v3M6.5 18.5h-3" />
+  </svg>
+);
+
+export const SendIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7Z" />
+  </svg>
+);
