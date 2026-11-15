@@ -10,8 +10,8 @@ const FEATURES = [
     text: "Query specific PDFs, entire folder trees, or your whole Drive using hybrid vector + keyword search with inline source citations.",
   },
   {
-    title: "Ask AI across your files",
-    text: "Query specific PDFs, entire folder trees, or your whole Drive using hybrid vector + keyword search with inline source citations.",
+    title: "Folders that nest",
+    text: "Organise files the way you already think: folders inside folders, with a path you can click back through.",
   },
   {
     title: "Private to your account",
